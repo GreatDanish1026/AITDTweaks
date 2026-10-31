@@ -1,45 +1,45 @@
-# AITDTweaks
+# AITDTweaks 0.2.0
 
-A ReShade add-on for **Alone in the Dark** (2024, PC) that sets the game's graphics from the
-ReShade overlay, live: no Engine.ini, no launcher.
+Graphics add-on for **Alone in the Dark** (2024, PC, Steam), for ReShade with add-on support.
+Raises the game's lighting, shadow and detail settings beyond what its menu offers, live, from an
+in-game overlay.
 
-The overlay has one tab per area. Every setting has a **Game** state (the game's own
-behaviour): a choice's first option, or a slider whose box is unticked. Hovering a setting
-explains it and shows the game's value. Changes apply at once.
+- **Lighting**: screen-space bounce light (Unreal's SSGI, shipped switched off), more ambient
+  occlusion levels or GTAO, the highest reflection quality and reflections on rougher surfaces,
+  finer volumetric fog, finer lighting on smoke, dust and glass.
+- **Shadows**: 4096 / 8192 shadow maps (the game uses 2048), longer shadow distance, sharper
+  shadows from bulbs and candles, softer cascade blending, contact-hardening shadows,
+  full-resolution character shadows.
+- **Detail**: texture memory beyond the game's 3 GB, textures kept fully loaded, further view
+  distance, the most detailed models, plants and characters.
+- **Image**: DLAA, DLSS and tonemapper sharpening, film grain and vignette, lens flares, bloom.
+- **HDR**: 2000-nit tone mapping in place of the game's 1000 nits.
+- **Quality presets**: *Ultra+* and *Cinematic* (not measured yet). **Measure preset costs** and
+  **Measure each option** check them on your PC (uncap the frame rate first).
+- **F8** switches every tweak off and on, to compare.
 
-- **Image**: DLAA, DLSS sharpening, image sharpening.
-- **Detail**: texture memory sized to your video card, 16x texture filtering, view distance,
-  mesh and foliage detail distance, character detail, keeping textures fully loaded.
-- **Shadows**: filtering, resolution up to 8192, shadow distance, sun cascades, small object
-  shadows, cascade blending, soft (PCSS) shadows, lamp and flashlight shadow detail, character
-  capsule shadows.
-- **Lighting**: ambient occlusion (full quality, more levels, or the engine's **GTAO**),
-  **screen space global illumination** (shipped switched off), reflections, volumetric fog,
-  skin scattering, smoke and glass lighting, light shafts.
-- **Advanced**: every console variable the settings control, the game's value and the current
-  one, and a reset for everything.
-
-Settings are kept in `ReShade.ini` under `[AITDTweaks]` and applied every time the game starts.
+Every option has a **Game** choice that shows the game's own value. The menu's highest setting
+already maxes shadow filtering, cascades, AO quality, skin, light shafts and 16x filtering, so
+those aren't offered. The game ships without ray tracing or distance fields compiled in.
 
 ## Install
 
-1. Install [ReShade](https://reshade.me) 6.8 or newer, **"with full add-on support"**, for
-   `AloneInTheDark\Binaries\Win64\AloneInTheDark-Win64-Shipping.exe` (DirectX 10/11/12).
-2. Copy `AITDTweaks.addon64` into that same folder.
-3. Start the game, press **Home**, and open the **AITDTweaks** tab.
+1. Install ReShade 6.8 or later with full add-on support for `AloneInTheDark-Win64-Shipping.exe`,
+   in `AloneInTheDark\AloneInTheDark\Binaries\Win64`.
+2. Copy `AITDTweaks.addon64` into that folder.
+3. Start the game, open ReShade (Home key), Add-ons tab, AITDTweaks.
 
-Uninstall: delete `AITDTweaks.addon64`. Values go back to the game's at the next start.
+Settings are saved in `ReShade.ini` under `[AITDTweaks]`. Log: `AITDTweaks.log` next to the game's
+exe (and `AITDTweaks-probe.txt`, every setting's value). Tested with the Steam version (exe
+timestamp 0x66549727). Uninstall: delete `AITDTweaks.addon64`.
 
-## Notes
+## Build
 
-- If the game build differs from the one analysed, the add-on checks the console variable
-  layout first and changes nothing if it doesn't match (the overlay says so).
-- It writes `AITDTweaks.log` next to the game executable.
-- The DLSS mode, HDR, film grain, motion blur and depth of field are in the game's own menu.
+`.\build.ps1` (Visual Studio 2022 C++ tools); `-Install` copies the add-on into the game folder
+(game closed), `-Package` makes the release zip.
 
-## Building
+## How it works
 
-Visual Studio 2022+ with the C++ x64 tools, then `.\build.ps1` (`-Install` copies it to the
-game; the game must be closed). See [docs/FINDINGS.md](docs/FINDINGS.md) for how it works.
-
-MIT License. ReShade and Dear ImGui headers: see THIRD_PARTY_NOTICES.txt.
+Everything goes through the game's console variables, set on the game thread (from the console
+manager's once-per-frame sinks call), at console priority; letting go puts the game's value and
+priority back. `docs/FINDINGS.md` has the UE 4.27 layout and the game's values.

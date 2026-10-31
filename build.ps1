@@ -1,43 +1,57 @@
 # Builds bin\AITDTweaks.addon64 with MSVC (Visual Studio 2022+ with C++ tools).
-# MSVC is required: ReShade is built with it, and MinGW returns API structs
-# differently, which crashes inside ReShade.
-# Usage: .\build.ps1 [-Install] [-GameBin <folder of AloneInTheDark-Win64-Shipping.exe>]
+# MSVC is required: ReShade is built with it, and MinGW returns API structs differently.
+# Usage: .\build.ps1 [-Install] [-Package] [-GameBin <folder of AloneInTheDark-Win64-Shipping.exe>]
+#   -Install  copies the add-on next to the game's exe (game closed).
+#   -Package  makes bin\release\AITDTweaks-<version>.zip: the add-on, README, LICENSE and
+#             THIRD_PARTY_NOTICES.
 param(
     [switch]$Install,
+    [switch]$Package,
     [string]$GameBin = "E:\SteamLibrary\steamapps\common\AloneInTheDark\AloneInTheDark\Binaries\Win64"
 )
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
-$name = "AITDTweaks"
-$addon = "$root\bin\$name.addon64"
 $exe = "AloneInTheDark-Win64-Shipping.exe"
 
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-# vcvars64.bat runs vswhere by name.
-$env:PATH = "$(Split-Path $vswhere);$env:PATH"
+$env:PATH = "$(Split-Path $vswhere);$env:PATH"  # vcvars64.bat runs vswhere by name
 $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
 if (-not $vs) { throw "Visual Studio with the C++ x64 tools not found." }
 $vcvars = Join-Path $vs "VC\Auxiliary\Build\vcvars64.bat"
 
 $obj = "$root\bin\obj"
 New-Item -ItemType Directory -Force $obj | Out-Null
+$addon = "$root\bin\AITDTweaks.addon64"
 
 # ReShade add-on headers in third_party\reshade match ReShade 6.8.0.
 $cmd = @(
     "call `"$vcvars`" >nul",
-    "rc /nologo /i `"$root\src`" /fo `"$obj\version.res`" `"$root\src\version.rc`"",
     ("cl /nologo /std:c++17 /O2 /EHsc /MT /W3 /D_CRT_SECURE_NO_WARNINGS /DNOMINMAX " +
      "/I `"$root\third_party\imgui`" /I `"$root\third_party\reshade\include`" " +
-     "/Fo`"$obj\\`" `"$root\src\addon.cpp`" `"$obj\version.res`" " +
-     "/link /DLL /OUT:`"$addon`" /PDB:`"$obj\$name.pdb`" /DEBUG")
+     "/Fo`"$obj\\`" `"$root\src\main.cpp`" user32.lib " +
+     "/link /DLL /OUT:`"$addon`" /PDB:`"$obj\AITDTweaks.pdb`" /DEBUG")
 ) -join " && "
 cmd /c $cmd
-if ($LASTEXITCODE) { throw "add-on build failed" }
-Write-Host "Built $addon ($name $((Get-Item $addon).VersionInfo.FileVersion))"
+if ($LASTEXITCODE) { throw "build failed" }
+Write-Host "Built $addon"
 
 if ($Install) {
     if (-not (Test-Path "$GameBin\$exe")) { throw "$exe not found in $GameBin (pass -GameBin)" }
-    if (Get-Process AloneInTheDark-Win64-Shipping, AloneInTheDark -ErrorAction SilentlyContinue) { throw "Close the game first." }
+    if (Get-Process ([IO.Path]::GetFileNameWithoutExtension($exe)) -ErrorAction SilentlyContinue) { throw "Close the game first." }
     Copy-Item $addon $GameBin -Force
-    Write-Host "Installed $name to $GameBin"
+    Write-Host "Installed to $GameBin"
+}
+
+if ($Package) {
+    $version = [regex]::Match((Get-Content "$root\src\version.h" -Raw), 'DT_VERSION "([^"]+)"').Groups[1].Value
+    $name = "AITDTweaks-$version"
+    $stage = "$root\bin\release\$name"
+    if (Test-Path $stage) { Remove-Item -Recurse -Force $stage }
+    New-Item -ItemType Directory -Force $stage | Out-Null
+    Copy-Item $addon, "$root\README.md", "$root\LICENSE", "$root\THIRD_PARTY_NOTICES.txt" $stage
+    $zip = "$root\bin\release\$name.zip"
+    if (Test-Path $zip) { Remove-Item -Force $zip }
+    Compress-Archive -Path "$stage\*" -DestinationPath $zip
+    Write-Host "Packaged $zip"
+    Get-ChildItem $stage -File | ForEach-Object { "{0,-36} {1,10:N0}" -f $_.Name, $_.Length }
 }

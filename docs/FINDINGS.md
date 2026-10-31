@@ -82,3 +82,48 @@ Emily and Edward textures and materials (905, 906).
 
 Layout check passed; every default applied on the first frame, none was changed back during a
 short session at the menu. Visual results of each setting still to be checked in game.
+
+## 0.2.0: the shared Tweaks design
+
+0.2.0 replaces 0.1.0's render-thread setting with TrueColorsTweaks' design (UE 4.25, same
+layout): every Set runs on the game thread from a vtable copy of the console manager whose
+CallAllConsoleVariableSinks slot (`+0x50`, RVA `0x196ebe0`; 6 call sites, `+0x58` RegisterSink 16
+sites, `tools/sinkcalls.py`) runs the add-on first. IsVariable* slots are found by reading their
+code (IsVariableBool at `+0x30`). Options are combos with a Game choice, presets Ultra+ and
+Cinematic, Measure preset costs / each option, F8, a probe file and an Advanced tab, as in the
+other Tweaks add-ons. The first start (nothing saved) picks Cinematic: about what the retired
+901/904 paks set.
+
+First run 2026-10-31: 3 of 3 singleton matches, layout check passed, all 20 Cinematic values
+taken, none put back during the menu.
+
+### The game's values (title screen and menu, 4K, menu at its highest)
+
+| Cvar | Game | Set by |
+|---|---|---|
+| r.Shadow.MaxResolution / MaxCSMResolution | 2048 | 0x01 |
+| r.Shadow.DistanceScale, r.ViewDistanceScale | 1 | 0x01 |
+| r.Shadow.TexelsPerPixelSpotlight | 2.546 | default |
+| r.Shadow.TexelsPerPixelPointlight / Rectlight | 1.273 | default |
+| r.SSR.Quality | 3 | 0x01 |
+| r.SSR.MaxRoughness | -1 (post-process value) | default |
+| r.SSGI.Enable / Quality / HalfRes | 0 / 3 / 1 | 0x03 / 0x01 / 0x03 |
+| r.AmbientOcclusionLevels / MaxQuality | -1 / 100 | 0x01 |
+| r.VolumetricFog.GridPixelSize / GridSizeZ | 8 / 128 | 0x01 |
+| r.TranslucencyLightingVolumeDim | 64 | 0x01 |
+| r.Streaming.PoolSize | 3000 | 0x01 |
+| r.Tonemapper.Quality / Sharpen | 5 / 0 | 0x01 / default |
+| r.BloomQuality / LensFlareQuality | 5 / 2 | 0x01 |
+| r.NGX.DLSS.Enable / Quality / DLAA.Enable | 1 / 1 / 0 | 0x07 |
+| r.HDR.EnableHDROutput / OutputDevice / ColorGamut | 1 / 5 / 2 | 0x02 / 0x05 / 0x05 |
+
+Already at the top in the menu (not offered): r.ShadowQuality 5, r.Shadow.CSM.MaxCascades 10,
+r.Shadow.RadiusThreshold 0.01, r.SSS.* full quality, r.LightShaftQuality 1, r.MaxAnisotropy 16,
+r.CapsuleShadows 1, fog depth slices 128.
+
+### HDR
+
+The game's HDR is Unreal's ACES output for a 1000-nit display in scRGB (OutputDevice 5, FP16
+swap chain, colour space scRGB). UE 4.27 has no peak-luminance cvar (only EnableHDROutput,
+OutputDevice, ColorGamut, UI.CompositeMode and UI.Level), so the highest built-in target is
+2000 nits (OutputDevice 6, the HDR tab's option).
