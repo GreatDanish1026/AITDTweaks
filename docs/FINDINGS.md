@@ -64,19 +64,13 @@ add-on copies it itself after each Set (`cvars::MirrorToRenderer`).
 Flags seen at run time: most render cvars at `0x01` (scalability), the SSGI cvars at `0x03`
 (project settings). The add-on sets at `0x09000000` (console), the highest there is.
 
-## Earlier pak mods folded into the overlay
+## Earlier pak mods (removed)
 
-The pak mods built before the add-on (never released) included two that only carried config:
-
-- `pakchunk901-ShadowDetailMax` (a `DefaultScalability.ini`): shadows, view distance, detail,
-  volumetric fog and reflections. Now the Detail, Shadows and Lighting defaults.
-- `pakchunk904-SSGIQuality` (a `DefaultEngine.ini`): `r.SSGI.Enable 1`, `Quality 4`, `HalfRes 0`.
-  Now the Lighting tab's global illumination.
-
-Both paks were moved out of the game to `AloneInTheDark\_AITDTweaks_retired_paks`. The asset
-mods stay paks: atmosphere maps (900), surface materials (902), post-process reflection quality
-70 to 100 (903: `r.SSR.Quality` can only cap the post-process value, not raise it), and the
-Emily and Edward textures and materials (905, 906).
+Before the add-on, never-released pak mods (pakchunk900-906: atmosphere maps, a shadow/detail
+config, surface materials, post-process reflection quality 70 to 100, SSGI config, Emily and
+Edward 4K textures and materials) were tried. The two config-only ones (901 shadow/detail, 904
+SSGI) became the Cinematic preset's values. All of them were deleted from the game on 2026-10-31;
+the game is stock apart from this add-on.
 
 ## First run (0.1.0)
 
@@ -91,8 +85,8 @@ CallAllConsoleVariableSinks slot (`+0x50`, RVA `0x196ebe0`; 6 call sites, `+0x58
 sites, `tools/sinkcalls.py`) runs the add-on first. IsVariable* slots are found by reading their
 code (IsVariableBool at `+0x30`). Options are combos with a Game choice, presets Ultra+ and
 Cinematic, Measure preset costs / each option, F8, a probe file and an Advanced tab, as in the
-other Tweaks add-ons. The first start (nothing saved) picks Cinematic: about what the retired
-901/904 paks set.
+other Tweaks add-ons. With nothing saved every option starts at Game (0.2.0's first build picked
+Cinematic on the first start instead; dropped with the old paks).
 
 First run 2026-10-31: 3 of 3 singleton matches, layout check passed, all 20 Cinematic values
 taken, none put back during the menu.

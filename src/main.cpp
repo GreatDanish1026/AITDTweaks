@@ -19,8 +19,7 @@
 // Set), and the cvar lookup cache has its own lock.
 //
 // The game ships without ray tracing or mesh distance fields compiled in, so there are no ray
-// traced or distance field options. The asset mods (atmosphere, materials, reflections,
-// character textures) stay separate paks.
+// traced or distance field options.
 //
 // The add-on never patches game code. It writes AITDTweaks.log (and -probe.txt) next to the
 // game executable.
@@ -151,7 +150,7 @@ std::vector<Option> g_options = {
      "Unreal's screen-space global illumination: light bouncing off lit surfaces into the\n"
      "room around them (lamp spill on walls, colour bleeding from rugs and wood). The game\n"
      "ships it switched off. High: quality 3 at half resolution. Ultra: quality 4 at full\n"
-     "resolution (what the earlier SSGI pak set). Not measured here yet.",
+     "resolution. Not measured here yet.",
      L"r.SSGI.Enable",
      {{"Game", 0, {}},
       {"High", 3, {{L"r.SSGI.Enable", L"1"}, {L"r.SSGI.Quality", L"3"}, {L"r.SSGI.HalfRes", L"1"}}},
@@ -167,14 +166,14 @@ std::vector<Option> g_options = {
       {"GTAO", 10, {{L"r.AmbientOcclusion.Method", L"1"}}}}},
     {"Lighting", "Reflections", "Reflections", "Reflection quality",
      "Quality of the screen-space reflections on polished floors, wood and wet surfaces.\n"
-     "The game uses 3; Max is Unreal's highest (4). The reflections pak raises the\n"
-     "post-process quality that caps this.",
+     "The game uses 3; Max is Unreal's highest (4). The game's post-process settings\n"
+     "(quality 70) may hold some scenes below it.",
      L"r.SSR.Quality",
      {{"Game", 0, {}}, {"Max", 4, {{L"r.SSR.Quality", L"4"}}}}},
     {"Lighting", "Reflections", "ReflectionRoughness", "Rough surface reflections",
      "How rough a surface can be and still get screen-space reflections. Higher reaches\n"
-     "varnished wood and stone; costs more and can look noisy. The reflections pak sets\n"
-     "0.8 in the shared post-process settings.",
+     "varnished wood and stone; costs more and can look noisy. The game's shared\n"
+     "post-process settings use 0.6.",
      L"r.SSR.MaxRoughness",
      {{"Game", 0, {}},
       {"0.6", 60, {{L"r.SSR.MaxRoughness", L"0.6"}}},
@@ -183,7 +182,7 @@ std::vector<Option> g_options = {
     {"Lighting", "Fog and translucency", "Fog", "Volumetric fog",
      "Detail of the volumetric fog and the light shafts through it. The game uses 8 px\n"
      "cells. High: 6 px. Ultra: 4 px with more samples for new fog (the game's cinematic\n"
-     "values, what the earlier Shadow/Detail Max pak set), about 4x the fog work.",
+     "values), about 4x the fog work.",
      L"r.VolumetricFog.GridPixelSize",
      {{"Game", 0, {}},
       {"High (6 px)", 6, {{L"r.VolumetricFog.GridPixelSize", L"6"}}},
@@ -734,15 +733,13 @@ const QualityPreset kPresets[] = {
       {"FoliageDetail", 1}, {"CharacterLod", 1}}},
     {"Cinematic", "",
      "Ultra+ plus screen-space bounce light at full quality, the sharpest (8192) and longest\n"
-     "shadows, the finest fog, reflections on rougher surfaces and twice the view distance.\n"
-     "This is what the earlier Shadow/Detail Max and SSGI paks set.\n\n"
+     "shadows, the finest fog, reflections on rougher surfaces and twice the view distance.\n\n"
      "Not measured yet: use Measure preset costs.",
      {{"Ssgi", 4}, {"ShadowRes", 8192}, {"ShadowDistance", 200}, {"LampShadows", 2}, {"CapsuleShadows", 1},
       {"Reflections", 4}, {"ReflectionRoughness", 80}, {"TranslucencyLighting", 128}, {"Fog", 4}, {"TexturePool", 8192},
       {"ViewDistance", 200}, {"MeshDetail", 1}, {"FoliageDetail", 1}, {"CharacterLod", 1}}},
 };
 constexpr int kPresetCount = static_cast<int>(sizeof(kPresets) / sizeof(kPresets[0]));
-constexpr int kCinematic = 2;
 
 Option* FindOption(const char* key) {
     for (Option& o : g_options)
@@ -775,18 +772,11 @@ void ApplyPreset(int index) {
     g_dirty = true;
 }
 
-// Reads the saved choices. The first time (nothing saved yet) it starts at Cinematic: the
-// earlier Shadow/Detail Max and SSGI paks this add-on replaces set about that.
+// Reads the saved choices; with nothing saved every option is at Game.
 void LoadSettings() {
-    int saved = 0;
     for (Option& o : g_options) {
-        if (reshade::get_config_value(nullptr, DT_PRODUCT, o.key, o.value)) ++saved;
+        reshade::get_config_value(nullptr, DT_PRODUCT, o.key, o.value);
         if (!Chosen(o)) o.value = 0;
-    }
-    if (!saved) {
-        ApplyPreset(kCinematic);
-        SaveSettings();
-        Log("first start: preset Cinematic (what the replaced paks set)");
     }
 }
 
