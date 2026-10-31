@@ -150,7 +150,8 @@ std::vector<Option> g_options = {
      "Unreal's screen-space global illumination: light bouncing off lit surfaces into the\n"
      "room around them (lamp spill on walls, colour bleeding from rugs and wood). The game\n"
      "ships it switched off. High: quality 3 at half resolution. Ultra: quality 4 at full\n"
-     "resolution. Not measured here yet.",
+     "resolution. The costliest option here: High about 24%, Ultra about 130% longer\n"
+     "frames (measured).",
      L"r.SSGI.Enable",
      {{"Game", 0, {}},
       {"High", 3, {{L"r.SSGI.Enable", L"1"}, {L"r.SSGI.Quality", L"3"}, {L"r.SSGI.HalfRes", L"1"}}},
@@ -159,7 +160,7 @@ std::vector<Option> g_options = {
      "The screen-space contact shading in corners, creases and under furniture. The game\n"
      "already runs it at full quality. More levels: also deeper, smoother shading over\n"
      "larger areas. GTAO: Unreal's ground-truth method in place of SSAO (more accurate,\n"
-     "no dark halos; experimental in 4.27).",
+     "no dark halos; experimental in 4.27). Each about 3% (measured).",
      L"r.AmbientOcclusionLevels",
      {{"Game", 0, {}},
       {"More levels", 3, {{L"r.AmbientOcclusionLevels", L"3"}}},
@@ -167,13 +168,13 @@ std::vector<Option> g_options = {
     {"Lighting", "Reflections", "Reflections", "Reflection quality",
      "Quality of the screen-space reflections on polished floors, wood and wet surfaces.\n"
      "The game uses 3; Max is Unreal's highest (4). The game's post-process settings\n"
-     "(quality 70) may hold some scenes below it.",
+     "(quality 70) may hold some scenes below it. Free (measured).",
      L"r.SSR.Quality",
      {{"Game", 0, {}}, {"Max", 4, {{L"r.SSR.Quality", L"4"}}}}},
     {"Lighting", "Reflections", "ReflectionRoughness", "Rough surface reflections",
      "How rough a surface can be and still get screen-space reflections. Higher reaches\n"
-     "varnished wood and stone; costs more and can look noisy. The game's shared\n"
-     "post-process settings use 0.6.",
+     "varnished wood and stone; can look noisy. The game's shared post-process settings\n"
+     "use 0.6. 0.6 and 0.8 are free, 1.0 about 1% (measured).",
      L"r.SSR.MaxRoughness",
      {{"Game", 0, {}},
       {"0.6", 60, {{L"r.SSR.MaxRoughness", L"0.6"}}},
@@ -182,7 +183,7 @@ std::vector<Option> g_options = {
     {"Lighting", "Fog and translucency", "Fog", "Volumetric fog",
      "Detail of the volumetric fog and the light shafts through it. The game uses 8 px\n"
      "cells. High: 6 px. Ultra: 4 px with more samples for new fog (the game's cinematic\n"
-     "values), about 4x the fog work.",
+     "values). High about 7%, Ultra about 30% longer frames (measured).",
      L"r.VolumetricFog.GridPixelSize",
      {{"Game", 0, {}},
       {"High (6 px)", 6, {{L"r.VolumetricFog.GridPixelSize", L"6"}}},
@@ -190,7 +191,8 @@ std::vector<Option> g_options = {
        {{L"r.VolumetricFog.GridPixelSize", L"4"}, {L"r.VolumetricFog.HistoryMissSupersampleCount", L"16"}}}}},
     {"Lighting", "Fog and translucency", "TranslucencyLighting", "Lighting on glass and particles",
      "Resolution of the 3D grid that lights translucent things (smoke, dust, particles,\n"
-     "glass). The game uses 64; 128 gives finer, less blotchy lighting.",
+     "glass). The game uses 64; 128 gives finer, less blotchy lighting. About 3%\n"
+     "(measured).",
      L"r.TranslucencyLightingVolumeDim",
      {{"Game", 0, {}}, {"High (128)", 128, {{L"r.TranslucencyLightingVolumeDim", L"128"}}}}},
 
@@ -199,13 +201,13 @@ std::vector<Option> g_options = {
      "Resolution of the shadow maps for lamps, the flashlight, the sun and the moon. The\n"
      "game uses 2048. Higher is sharper and steadier shadow edges. Highest gives the sun\n"
      "and moon 8192; lamps stay at 4096 (a bulb's shadow is six maps, so 8192 for every\n"
-     "lamp costs far too much).",
+     "lamp costs far too much). Both free (measured).",
      L"r.Shadow.MaxCSMResolution",
      {{"Game", 0, {}},
       {"High (4096)", 4096, {{L"r.Shadow.MaxResolution", L"4096"}, {L"r.Shadow.MaxCSMResolution", L"4096"}}},
       {"Highest (8192 sun)", 8192, {{L"r.Shadow.MaxResolution", L"4096"}, {L"r.Shadow.MaxCSMResolution", L"8192"}}}}},
     {"Shadows", "Shadow maps", "ShadowDistance", "Shadow distance",
-     "How far away lights still cast dynamic shadows.",
+     "How far away lights still cast dynamic shadows. Free (measured).",
      L"r.Shadow.DistanceScale",
      {{"Game", 0, {}},
       {"Far (150%)", 150, {{L"r.Shadow.DistanceScale", L"1.5"}}},
@@ -213,7 +215,7 @@ std::vector<Option> g_options = {
     {"Shadows", "Shadow maps", "LampShadows", "Lamp shadow detail",
      "Shadow map detail per screen pixel. The game gives spotlights (the flashlight, shaded\n"
      "lamps) 2.55 but point lights (bulbs, candles) and area lights only 1.27. Sharper:\n"
-     "point and area lights at 2.55 too. Sharpest: all three at 4.",
+     "point and area lights at 2.55 too. Sharpest: all three at 4. Free (measured).",
      L"r.Shadow.TexelsPerPixelPointlight",
      {{"Game", 0, {}},
       {"Sharper", 2, {{L"r.Shadow.TexelsPerPixelPointlight", L"2.55"}, {L"r.Shadow.TexelsPerPixelRectlight", L"2.55"}}},
@@ -222,24 +224,25 @@ std::vector<Option> g_options = {
         {L"r.Shadow.TexelsPerPixelRectlight", L"4"}}}}},
     {"Shadows", "Shadow maps", "CascadeBlend", "Cascade blending",
      "How gradually one sun or moon shadow cascade fades into the next. Soft: twice as\n"
-     "wide, so the line where shadows get blurrier is harder to see.",
+     "wide, so the line where shadows get blurrier is harder to see. Free (measured).",
      L"r.Shadow.CSM.TransitionScale",
      {{"Game", 0, {}}, {"Soft", 2, {{L"r.Shadow.CSM.TransitionScale", L"2"}}}}},
     {"Shadows", "Shadow maps", "ShadowFilter", "Soft shadow filter",
      "Contact-hardening shadows (PCSS, experimental in 4.27): sharp where an object\n"
-     "touches the ground, softer further away, like real shadows. Sun and moon only.",
+     "touches the ground, softer further away, like real shadows. Sun and moon only.\n"
+     "About 3% (measured).",
      L"r.Shadow.FilterMethod",
      {{"Game", 0, {}}, {"Contact-hardening", 1, {{L"r.Shadow.FilterMethod", L"1"}}}}},
     {"Shadows", "Characters", "CapsuleShadows", "Character soft shadows",
      "The soft indirect shadows characters cast on the floor and walls, at full\n"
-     "resolution instead of half.",
+     "resolution instead of half. About 2% (measured).",
      L"r.CapsuleShadowsFullResolution",
      {{"Game", 0, {}}, {"Full resolution", 1, {{L"r.CapsuleShadowsFullResolution", L"1"}}}}},
 
     // ------------------------------------------------ detail
     {"Detail", "Textures", "TexturePool", "Texture memory",
      "Video memory for streamed textures. The game keeps about 3 GB whatever the card,\n"
-     "so textures can go blurry and reload. Free on a 16 GB card.",
+     "so textures can go blurry and reload. Free on a 16 GB card (measured).",
      L"r.Streaming.PoolSize",
      {{"Game", 0, {}},
       {"4 GB", 4096, {{L"r.Streaming.PoolSize", L"4096"}}},
@@ -247,29 +250,29 @@ std::vector<Option> g_options = {
       {"8 GB", 8192, {{L"r.Streaming.PoolSize", L"8192"}}}}},
     {"Detail", "Textures", "KeepTextures", "Keep textures loaded",
      "Keeps every texture in view at full resolution instead of streaming detail in:\n"
-     "no texture pop-in, more video memory.",
+     "no texture pop-in, more video memory. About 1% (measured).",
      L"r.Streaming.FullyLoadUsedTextures",
      {{"Game", 0, {}}, {"On", 1, {{L"r.Streaming.FullyLoadUsedTextures", L"1"}}}}},
     {"Detail", "Distance", "ViewDistance", "View distance",
      "How far away objects are drawn, as a multiple of the game's distances. Less pop-in\n"
-     "outdoors.",
+     "outdoors. About 1% (measured).",
      L"r.ViewDistanceScale",
      {{"Game", 0, {}},
       {"Far (150%)", 150, {{L"r.ViewDistanceScale", L"1.5"}}},
       {"Farthest (200%)", 200, {{L"r.ViewDistanceScale", L"2"}}}}},
     {"Detail", "Distance", "MeshDetail", "Model detail",
      "Distance at which models switch to their simpler versions. Finer keeps the detailed\n"
-     "version twice as far.",
+     "version twice as far. About 1% (measured).",
      L"r.StaticMeshLODDistanceScale",
      {{"Game", 0, {}}, {"Finer", 1, {{L"r.StaticMeshLODDistanceScale", L"0.5"}}}}},
     {"Detail", "Distance", "FoliageDetail", "Foliage detail",
      "Distance at which plants and trees switch to their simpler versions. Finer keeps\n"
-     "the detailed version twice as far (gardens, the bayou).",
+     "the detailed version twice as far (gardens, the bayou). About 1% (measured).",
      L"foliage.LODDistanceScale",
      {{"Game", 0, {}}, {"Finer", 1, {{L"foliage.LODDistanceScale", L"2"}}}}},
     {"Detail", "Characters", "CharacterLod", "Character detail",
      "Keeps characters on their most detailed model at a distance instead of switching to\n"
-     "simpler versions.",
+     "simpler versions. About 1% (measured).",
      L"r.SkeletalMeshLODBias",
      {{"Game", 0, {}}, {"Highest", 1, {{L"r.SkeletalMeshLODBias", L"-1"}}}}},
 
@@ -733,26 +736,31 @@ struct QualityPreset {
 
 const QualityPreset kPresets[] = {
     {"Game", "", "The game's own settings: every Lighting, Shadows and Detail option at Game.", {}},
-    // Measured 2026-10-31 (RTX 5080, 4K, DLSS, one scene, but with the 144 fps cap still on, so
-    // Game read 144 fps and every cost is a lower bound): Ultra+ 128 fps (+12% frame time). The
-    // first Cinematic (full-res quality 4 SSGI, 8192 maps for every lamp, 2x shadow distance)
-    // ran at 54 fps (+168%); rebalanced below, not measured again yet.
-    {"Ultra+", "about 12% or more",
-     "Everything beyond the menu that should cost little: sharper (4096) and longer shadows,\n"
-     "sharper lamp and flashlight shadows, full-resolution character shadows, the highest\n"
-     "reflection quality, finer fog and translucency lighting, 8 GB of textures, further\n"
-     "view distance and the most detailed models, plants and characters.\n\n"
-     "Measured on an RTX 5080 at 4K with DLSS: 128 fps against Game's 144, which was the\n"
-     "frame cap, so it costs at least 12%.",
-     {{"ShadowRes", 4096}, {"ShadowDistance", 150}, {"LampShadows", 2}, {"CapsuleShadows", 1}, {"Reflections", 4},
-      {"TranslucencyLighting", 128}, {"Fog", 6}, {"TexturePool", 8192}, {"ViewDistance", 150}, {"MeshDetail", 1},
-      {"FoliageDetail", 1}, {"CharacterLod", 1}}},
-    {"Cinematic", "",
-     "Ultra+ plus screen-space bounce light (half resolution), 8192 sun and moon shadows,\n"
-     "the finest fog, reflections on rougher surfaces and twice the view distance.\n\n"
-     "Rebalanced after the first version measured about 170% longer frames (full-resolution\n"
-     "bounce light, 8192 shadows for every lamp, twice the shadow distance); those stay on\n"
-     "their tabs. Not measured again yet: use Measure preset costs.",
+    // Measured 2026-10-31 (RTX 5080, 4K, DLSS Quality, one scene; Game held at 144 fps by V-Sync
+    // with G-Sync, so the costs are against 144 fps): Ultra+ 127 fps (+13% frame time),
+    // Cinematic 90 fps (+59%). The first Cinematic (full-res quality 4 SSGI, 8192 maps for every
+    // lamp, 2x shadow distance) ran at 54 fps. Per option: SSGI High +24% / Ultra +132%, fog
+    // High +7% / Ultra +30%, everything else 3% or less (table in docs/FINDINGS.md).
+    // Ultra+ then got SSGI High (user: Ultra+ should sit between Game and Cinematic): expected
+    // about +35% from the per-option costs; not measured as a whole yet.
+    {"Ultra+", "about 35% slower",
+     "The middle step: screen-space bounce light (half resolution) and everything that costs\n"
+     "little: sharper (4096) and longer shadows, sharper lamp and flashlight shadows,\n"
+     "full-resolution character shadows, the highest reflection quality, finer fog and\n"
+     "translucency lighting, 8 GB of textures, further view distance and the most detailed\n"
+     "models, plants and characters.\n\n"
+     "Expected about 35% longer frames on an RTX 5080 at 4K with DLSS Quality (the bounce\n"
+     "light measured 24%, the rest 13% together); Measure preset costs checks it.",
+     {{"Ssgi", 3}, {"ShadowRes", 4096}, {"ShadowDistance", 150}, {"LampShadows", 2}, {"CapsuleShadows", 1},
+      {"Reflections", 4}, {"TranslucencyLighting", 128}, {"Fog", 6}, {"TexturePool", 8192}, {"ViewDistance", 150},
+      {"MeshDetail", 1}, {"FoliageDetail", 1}, {"CharacterLod", 1}}},
+    {"Cinematic", "about 60% slower",
+     "Ultra+ plus the finest fog, 8192 sun and moon shadows, reflections on rougher surfaces\n"
+     "and twice the view distance.\n\n"
+     "Measured on an RTX 5080 at 4K with DLSS Quality: 90 fps against Game's 144 (about\n"
+     "60% longer frames), almost all of it the bounce light and the finest fog.\n"
+     "Full-resolution bounce light (Ultra) is left out: it alone more than doubles the\n"
+     "frame time.",
      {{"Ssgi", 3}, {"ShadowRes", 8192}, {"ShadowDistance", 150}, {"LampShadows", 2}, {"CapsuleShadows", 1},
       {"Reflections", 4}, {"ReflectionRoughness", 80}, {"TranslucencyLighting", 128}, {"Fog", 4}, {"TexturePool", 8192},
       {"ViewDistance", 200}, {"MeshDetail", 1}, {"FoliageDetail", 1}, {"CharacterLod", 1}}},
@@ -885,16 +893,32 @@ void FinishMeasure(const char* why) {
     Log("measure: %s", why);
 }
 
-// True if Game ran at the game's frame rate limit (t.MaxFPS): then the measured costs are only
-// lower bounds. V-Sync caps aren't detected.
+// The refresh rate of the monitor the game's window is on (0 if unknown): V-Sync holds the
+// frame rate there.
+float RefreshRate() {
+    HWND w = GetForegroundWindow();
+    HMONITOR m = w ? MonitorFromWindow(w, MONITOR_DEFAULTTOPRIMARY) : nullptr;
+    MONITORINFOEXW mi = {};
+    mi.cbSize = sizeof(mi);
+    DEVMODEW dm = {};
+    dm.dmSize = sizeof(dm);
+    if (!m || !GetMonitorInfoW(m, &mi) || !EnumDisplaySettingsW(mi.szDevice, ENUM_CURRENT_SETTINGS, &dm)) return 0;
+    return dm.dmDisplayFrequency > 1 ? static_cast<float>(dm.dmDisplayFrequency) : 0.0f;
+}
+
+// True if Game ran at a frame rate cap: the game's limit (t.MaxFPS) or the display's refresh
+// rate (V-Sync). The measured costs are then only lower bounds.
 bool AtFrameCap(float gameMs) {
+    if (gameMs <= 0) return false;
+    const float fps = 1000.0f / gameMs;
     std::wstring v;
-    float cap = Read(L"t.MaxFPS", v) ? static_cast<float>(_wtof(v.c_str())) : 0.0f;
-    return cap > 0 && gameMs > 0 && 1000.0f / gameMs >= cap * 0.98f;
+    const float limit = Read(L"t.MaxFPS", v) ? static_cast<float>(_wtof(v.c_str())) : 0.0f;
+    const float refresh = RefreshRate();
+    return (limit > 0 && fps >= limit * 0.98f) || (refresh > 0 && fps >= refresh * 0.98f);
 }
 
 constexpr const char* kCapNote =
-    " Game ran at the frame rate limit, so these costs are too low: set Image > Frame rate limit to "
+    " Game ran at the frame rate cap, so these costs are too low: set Image > Frame rate limit to "
     "Unlimited, switch V-Sync off in the game's menu and measure again.";
 
 void SummarizeMeasure() {

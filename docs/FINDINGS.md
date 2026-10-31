@@ -108,9 +108,34 @@ are lower bounds:
 The first Cinematic had full-resolution quality 4 SSGI, 8192 shadow maps for every light (a
 point light's shadow is a six-face cube map) and twice the shadow distance. Rebalanced: SSGI
 High (quality 3, half resolution), 8192 for the sun and moon only (lamps 4096: "Highest" now
-means that everywhere), 1.5x shadow distance. Not measured again yet. Measure now says when Game
-ran at `t.MaxFPS`. "Measure each option" was stopped both times, so there are no per-option
-costs yet.
+means that everywhere), 1.5x shadow distance.
+
+Second run (same day, same scene). The frame rate limit was raised to 240, but V-Sync with
+G-Sync still held Game at the 144 Hz refresh (options above it measured at in-between rates, so
+the costly ones are real; the cheap ones may cost a little more than shown):
+
+| Preset | Frame time | fps | vs Game |
+|---|---|---|---|
+| Game | 6.96 ms | 144 (refresh) | |
+| Ultra+ (then without SSGI) | 7.87 ms | 127 | +13% |
+| Cinematic (rebalanced) | 11.09 ms | 90 | +59% |
+
+Each option alone (Game 7.02 ms, the mean of the start and end runs):
+
+| Option | Cost |
+|---|---|
+| SSGI Ultra (quality 4, full res) | +132% |
+| Volumetric fog Ultra (4 px) | +30% |
+| SSGI High (quality 3, half res) | +24% |
+| Volumetric fog High (6 px) | +7% |
+| Translucency lighting 128, PCSS, AO more levels, GTAO, full-res capsule shadows | +2.4 to +3.2% each |
+| Rough reflections 1.0, view distance, character / mesh / foliage detail, keep textures | about +1% each |
+| Shadow resolution 4096 / 8192 sun, shadow distance, lamp shadows, cascade blend, SSR 4, texture pool, rough reflections 0.6 / 0.8 | free (within ±0.5%) |
+
+Ultra+ was then moved between Game and Cinematic (user's request): it gained SSGI High, so it
+should cost about +35% (13% + 24%); not measured as a whole yet. Cinematic differs from it by
+the 4 px fog, 8192 sun shadows, roughness 0.8 and 2x view distance. Costs are in every
+tooltip. Measure warns when Game ran at `t.MaxFPS` or at the display's refresh rate.
 
 ### The game's values (title screen and menu, 4K, menu at its highest)
 
