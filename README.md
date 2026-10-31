@@ -16,9 +16,9 @@ in-game overlay.
   tonemapper sharpening, film grain and vignette, lens flares, bloom.
 - **HDR**: not included: use RenoDX for HDR (it replaces the game's tone mapping and sets the peak).
 - **Quality presets**: *Ultra+* (screen-space bounce light at half resolution plus everything
-  that costs little; about 35% slower, expected) and *Cinematic* (Ultra+ plus the finest fog,
-  8192 sun shadows, rougher reflections and twice the view distance; about 60% slower, measured
-  on an RTX 5080 at 4K with DLSS Quality). **Measure preset costs** and **Measure each option**
+  that costs little; about 35% slower) and *Cinematic* (Ultra+ plus the finest fog, 8192 sun
+  shadows, rougher reflections and twice the view distance; about 55-60% slower). Measured on an
+  RTX 5080 at 4K with DLSS Quality in one scene. **Measure preset costs** and **Measure each option**
   check them on your PC (uncap the frame rate first).
 - **F8** switches every tweak off and on, to compare.
 

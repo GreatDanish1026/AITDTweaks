@@ -741,24 +741,25 @@ const QualityPreset kPresets[] = {
     // Cinematic 90 fps (+59%). The first Cinematic (full-res quality 4 SSGI, 8192 maps for every
     // lamp, 2x shadow distance) ran at 54 fps. Per option: SSGI High +24% / Ultra +132%, fog
     // High +7% / Ultra +30%, everything else 3% or less (table in docs/FINDINGS.md).
-    // Ultra+ then got SSGI High (user: Ultra+ should sit between Game and Cinematic): expected
-    // about +35% from the per-option costs; not measured as a whole yet.
+    // Ultra+ then got SSGI High (user: Ultra+ should sit between Game and Cinematic). Third run,
+    // uncapped (Game 7.25 ms, 138 fps): Ultra+ 9.82 ms (102 fps, +35%), Cinematic 11.32 ms
+    // (88 fps, +56%).
     {"Ultra+", "about 35% slower",
      "The middle step: screen-space bounce light (half resolution) and everything that costs\n"
      "little: sharper (4096) and longer shadows, sharper lamp and flashlight shadows,\n"
      "full-resolution character shadows, the highest reflection quality, finer fog and\n"
      "translucency lighting, 8 GB of textures, further view distance and the most detailed\n"
      "models, plants and characters.\n\n"
-     "Expected about 35% longer frames on an RTX 5080 at 4K with DLSS Quality (the bounce\n"
-     "light measured 24%, the rest 13% together); Measure preset costs checks it.",
+     "Measured on an RTX 5080 at 4K with DLSS Quality: 102 fps against Game's 138 (about\n"
+     "35% longer frames), two thirds of it the bounce light.",
      {{"Ssgi", 3}, {"ShadowRes", 4096}, {"ShadowDistance", 150}, {"LampShadows", 2}, {"CapsuleShadows", 1},
       {"Reflections", 4}, {"TranslucencyLighting", 128}, {"Fog", 6}, {"TexturePool", 8192}, {"ViewDistance", 150},
       {"MeshDetail", 1}, {"FoliageDetail", 1}, {"CharacterLod", 1}}},
-    {"Cinematic", "about 60% slower",
+    {"Cinematic", "about 55-60% slower",
      "Ultra+ plus the finest fog, 8192 sun and moon shadows, reflections on rougher surfaces\n"
      "and twice the view distance.\n\n"
-     "Measured on an RTX 5080 at 4K with DLSS Quality: 90 fps against Game's 144 (about\n"
-     "60% longer frames), almost all of it the bounce light and the finest fog.\n"
+     "Measured on an RTX 5080 at 4K with DLSS Quality: 88 fps against Game's 138 (about\n"
+     "56% longer frames), almost all of it the bounce light and the finest fog.\n"
      "Full-resolution bounce light (Ultra) is left out: it alone more than doubles the\n"
      "frame time.",
      {{"Ssgi", 3}, {"ShadowRes", 8192}, {"ShadowDistance", 150}, {"LampShadows", 2}, {"CapsuleShadows", 1},

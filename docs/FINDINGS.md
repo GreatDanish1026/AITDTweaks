@@ -132,8 +132,9 @@ Each option alone (Game 7.02 ms, the mean of the start and end runs):
 | Rough reflections 1.0, view distance, character / mesh / foliage detail, keep textures | about +1% each |
 | Shadow resolution 4096 / 8192 sun, shadow distance, lamp shadows, cascade blend, SSR 4, texture pool, rough reflections 0.6 / 0.8 | free (within ±0.5%) |
 
-Ultra+ was then moved between Game and Cinematic (user's request): it gained SSGI High, so it
-should cost about +35% (13% + 24%); not measured as a whole yet. Cinematic differs from it by
+Ultra+ was then moved between Game and Cinematic (user's request): it gained SSGI High. Third run
+(same scene, uncapped: Game 7.25 ms, 138 fps): Ultra+ 9.82 ms, 102 fps, **+35%**; Cinematic
+11.32 ms, 88 fps, **+56%**. Cinematic differs from it by
 the 4 px fog, 8192 sun shadows, roughness 0.8 and 2x view distance. Costs are in every
 tooltip. Measure warns when Game ran at `t.MaxFPS` or at the display's refresh rate.
 
