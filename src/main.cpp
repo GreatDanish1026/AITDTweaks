@@ -197,12 +197,13 @@ std::vector<Option> g_options = {
     // ------------------------------------------------ shadows
     {"Shadows", "Shadow maps", "ShadowRes", "Shadow resolution",
      "Resolution of the shadow maps for lamps, the flashlight, the sun and the moon. The\n"
-     "game uses 2048. Higher is sharper and steadier shadow edges; 8192 costs the most\n"
-     "video memory.",
+     "game uses 2048. Higher is sharper and steadier shadow edges. Highest gives the sun\n"
+     "and moon 8192; lamps stay at 4096 (a bulb's shadow is six maps, so 8192 for every\n"
+     "lamp costs far too much).",
      L"r.Shadow.MaxCSMResolution",
      {{"Game", 0, {}},
       {"High (4096)", 4096, {{L"r.Shadow.MaxResolution", L"4096"}, {L"r.Shadow.MaxCSMResolution", L"4096"}}},
-      {"Highest (8192)", 8192, {{L"r.Shadow.MaxResolution", L"8192"}, {L"r.Shadow.MaxCSMResolution", L"8192"}}}}},
+      {"Highest (8192 sun)", 8192, {{L"r.Shadow.MaxResolution", L"4096"}, {L"r.Shadow.MaxCSMResolution", L"8192"}}}}},
     {"Shadows", "Shadow maps", "ShadowDistance", "Shadow distance",
      "How far away lights still cast dynamic shadows.",
      L"r.Shadow.DistanceScale",
@@ -722,20 +723,27 @@ struct QualityPreset {
 
 const QualityPreset kPresets[] = {
     {"Game", "", "The game's own settings: every Lighting, Shadows and Detail option at Game.", {}},
-    {"Ultra+", "",
+    // Measured 2026-10-31 (RTX 5080, 4K, DLSS, one scene, but with the 144 fps cap still on, so
+    // Game read 144 fps and every cost is a lower bound): Ultra+ 128 fps (+12% frame time). The
+    // first Cinematic (full-res quality 4 SSGI, 8192 maps for every lamp, 2x shadow distance)
+    // ran at 54 fps (+168%); rebalanced below, not measured again yet.
+    {"Ultra+", "about 12% or more",
      "Everything beyond the menu that should cost little: sharper (4096) and longer shadows,\n"
      "sharper lamp and flashlight shadows, full-resolution character shadows, the highest\n"
      "reflection quality, finer fog and translucency lighting, 8 GB of textures, further\n"
      "view distance and the most detailed models, plants and characters.\n\n"
-     "Not measured yet: use Measure preset costs.",
+     "Measured on an RTX 5080 at 4K with DLSS: 128 fps against Game's 144, which was the\n"
+     "frame cap, so it costs at least 12%.",
      {{"ShadowRes", 4096}, {"ShadowDistance", 150}, {"LampShadows", 2}, {"CapsuleShadows", 1}, {"Reflections", 4},
       {"TranslucencyLighting", 128}, {"Fog", 6}, {"TexturePool", 8192}, {"ViewDistance", 150}, {"MeshDetail", 1},
       {"FoliageDetail", 1}, {"CharacterLod", 1}}},
     {"Cinematic", "",
-     "Ultra+ plus screen-space bounce light at full quality, the sharpest (8192) and longest\n"
-     "shadows, the finest fog, reflections on rougher surfaces and twice the view distance.\n\n"
-     "Not measured yet: use Measure preset costs.",
-     {{"Ssgi", 4}, {"ShadowRes", 8192}, {"ShadowDistance", 200}, {"LampShadows", 2}, {"CapsuleShadows", 1},
+     "Ultra+ plus screen-space bounce light (half resolution), 8192 sun and moon shadows,\n"
+     "the finest fog, reflections on rougher surfaces and twice the view distance.\n\n"
+     "Rebalanced after the first version measured about 170% longer frames (full-resolution\n"
+     "bounce light, 8192 shadows for every lamp, twice the shadow distance); those stay on\n"
+     "their tabs. Not measured again yet: use Measure preset costs.",
+     {{"Ssgi", 3}, {"ShadowRes", 8192}, {"ShadowDistance", 150}, {"LampShadows", 2}, {"CapsuleShadows", 1},
       {"Reflections", 4}, {"ReflectionRoughness", 80}, {"TranslucencyLighting", 128}, {"Fog", 4}, {"TexturePool", 8192},
       {"ViewDistance", 200}, {"MeshDetail", 1}, {"FoliageDetail", 1}, {"CharacterLod", 1}}},
 };
@@ -867,9 +875,23 @@ void FinishMeasure(const char* why) {
     Log("measure: %s", why);
 }
 
+// True if Game ran at the game's frame rate limit (t.MaxFPS): then the measured costs are only
+// lower bounds. V-Sync caps aren't detected.
+bool AtFrameCap(float gameMs) {
+    std::wstring v;
+    float cap = Read(L"t.MaxFPS", v) ? static_cast<float>(_wtof(v.c_str())) : 0.0f;
+    return cap > 0 && gameMs > 0 && 1000.0f / gameMs >= cap * 0.98f;
+}
+
+constexpr const char* kCapNote =
+    " Game ran at the frame rate limit, so these costs are too low: switch off the limit and V-Sync in the "
+    "game's menu and measure again.";
+
 void SummarizeMeasure() {
     const std::vector<float>& r = g_measure.resultMs;
     const float base = g_measure.perOption ? (r.front() + r.back()) / 2 : r.front();
+    const bool capped = AtFrameCap(base);
+    if (capped) Log("measure: Game ran at the t.MaxFPS limit; costs are lower bounds");
     char line[160];
     if (!g_measure.perOption) {
         std::string sum = "Game " + std::to_string(static_cast<int>(1000.0f / r[0] + 0.5f)) + " fps";
@@ -882,7 +904,7 @@ void SummarizeMeasure() {
                      (r[i] / base - 1) * 100);
             log += line;
         }
-        g_measure.summary = sum;
+        g_measure.summary = sum + (capped ? kCapNote : "");
         Log("%s (Game %.2f ms)", log.c_str(), r[0]);
         return;
     }
@@ -901,7 +923,7 @@ void SummarizeMeasure() {
             sum += line;
         }
     }
-    g_measure.summary = sum + " (all in " DT_PRODUCT ".log)";
+    g_measure.summary = sum + " (all in " DT_PRODUCT ".log)" + (capped ? kCapNote : "");
 }
 
 void MeasureOnFrame(float ms, bool focused) {

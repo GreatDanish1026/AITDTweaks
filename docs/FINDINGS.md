@@ -93,6 +93,25 @@ Cinematic on the first start instead; dropped with the old paks).
 First run 2026-10-31: 3 of 3 singleton matches, layout check passed, all 20 Cinematic values
 taken, none put back during the menu.
 
+### Preset costs
+
+Measured 2026-10-31 with Measure preset costs (RTX 5080, 4K, DLSS Quality, one scene). The
+game's 144 fps limit (`t.MaxFPS 144`) was still on, so Game read exactly 144 fps and the costs
+are lower bounds:
+
+| Preset | Frame time | fps | vs Game |
+|---|---|---|---|
+| Game | 6.95 ms | 144 (capped) | |
+| Ultra+ | 7.81 ms | 128 | +12% or more |
+| Cinematic (first) | 18.59 ms | 54 | +168% or more |
+
+The first Cinematic had full-resolution quality 4 SSGI, 8192 shadow maps for every light (a
+point light's shadow is a six-face cube map) and twice the shadow distance. Rebalanced: SSGI
+High (quality 3, half resolution), 8192 for the sun and moon only (lamps 4096: "Highest" now
+means that everywhere), 1.5x shadow distance. Not measured again yet. Measure now says when Game
+ran at `t.MaxFPS`. "Measure each option" was stopped both times, so there are no per-option
+costs yet.
+
 ### The game's values (title screen and menu, 4K, menu at its highest)
 
 | Cvar | Game | Set by |
