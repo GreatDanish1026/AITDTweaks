@@ -13,7 +13,9 @@ Notes from reverse-engineering Alone in the Dark (2024) for AITDTweaks.
   `Engine.ini` there, which dropped the earlier mod installers' merges.
 - Shipped with `r.RayTracing=False` and `r.GenerateMeshDistanceFields=False`, so hardware ray
   tracing, distance field AO and distance field shadows can't be switched on at run time.
-- Shipped DLSS plugin: `nvngx_dlss.dll` 3.1.1. `r.NGX.DLSS.Preset` only accepts presets A-F.
+- Shipped DLSS plugin: `nvngx_dlss.dll` 3.1.1. `r.NGX.DLSS.Preset` only accepts presets A-F. On the
+  test PC it was swapped to 310.9.16 on 2026-10-26 (original kept beside it as `nvngx_dlss.dlsss`);
+  newer presets (J/K) are set from the NVIDIA app.
 - The game's "Graphics Mode" (Quality/Performance) only applies on consoles
   (`DefaultOFGraphicsModeDeveloperSettings.ini`).
 
