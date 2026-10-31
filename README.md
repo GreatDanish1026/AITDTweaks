@@ -13,7 +13,7 @@ in-game overlay.
 - **Detail**: texture memory beyond the game's 3 GB, textures kept fully loaded, further view
   distance, the most detailed models, plants and characters.
 - **Image**: DLAA, DLSS and tonemapper sharpening, film grain and vignette, lens flares, bloom.
-- **HDR**: 2000-nit tone mapping in place of the game's 1000 nits.
+- **HDR**: not included: use RenoDX for HDR (it replaces the game's tone mapping and sets the peak).
 - **Quality presets**: *Ultra+* and *Cinematic* (not measured yet). **Measure preset costs** and
   **Measure each option** check them on your PC (uncap the frame rate first).
 - **F8** switches every tweak off and on, to compare.

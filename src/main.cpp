@@ -139,7 +139,7 @@ struct Option {
 };
 
 constexpr const char* kImageTab = "Image";  // taste: in no preset, not measured
-constexpr const char* kHdrTab = "HDR";      // in no preset, not measured
+
 
 // Every cvar here exists in this exe (tools/hascvar.py). The game's values are from the first
 // run of 0.1.0 (docs/FINDINGS.md); options the menu's highest setting already maxes (shadow
@@ -306,15 +306,7 @@ std::vector<Option> g_options = {
      "The glow around lamps and bright windows. Off removes it; Max is the smoothest, widest.",
      L"r.BloomQuality",
      {{"Game", 0, {}}, {"Off", 1, {{L"r.BloomQuality", L"0"}}}, {"Max", 5, {{L"r.BloomQuality", L"5"}}}}},
-
-    // ------------------------------------------------ HDR (in no preset)
-    {kHdrTab, "HDR output", "HdrPeak", "HDR peak",
-     "Unreal 4.27 tone-maps HDR for a 1000 or a 2000 nit display. The game's HDR uses the\n"
-     "1000 nit scRGB output (device 5); 2000 nits (device 6) gives brighter highlights on a\n"
-     "display that reaches it. Only with the game's own HDR switched on (with HDR off it\n"
-     "would wash the picture out).",
-     L"r.HDR.Display.OutputDevice",
-     {{"Game", 0, {}}, {"2000 nits", 2000, {{L"r.HDR.Display.OutputDevice", L"6"}}}}},
+    // No HDR options: RenoDX replaces the game's tone mapping (and sets the peak) instead.
 };
 
 // Guards the options, the measurement and the requests to the game thread (present thread;
@@ -719,7 +711,7 @@ void __fastcall HookedSinks(void* self) {
 // ---------------------------------------------------------------- presets
 //
 // A preset sets the quality options (option key -> choice id); every other quality option goes
-// to Game. Image and HDR options are in no preset. The preset shown is derived from the options,
+// to Game. Image options are in no preset. The preset shown is derived from the options,
 // "Custom" when none matches. Not measured in this game yet.
 
 struct QualityPreset {
@@ -758,8 +750,8 @@ Option* FindOption(const char* key) {
     return nullptr;
 }
 
-// Lighting, Shadows and Detail; Image and HDR are taste.
-bool InPresets(const Option& o) { return strcmp(o.tab, kImageTab) && strcmp(o.tab, kHdrTab); }
+// Lighting, Shadows and Detail; Image is taste.
+bool InPresets(const Option& o) { return strcmp(o.tab, kImageTab) != 0; }
 
 int PresetValue(const QualityPreset& p, const std::string& key) {
     for (auto& [k, id] : p.values)
@@ -1064,9 +1056,6 @@ bool DrawOption(const View& view, Option& o) {
 
 bool DrawTab(const View& view, const char* tab) {
     bool changed = false;
-    if (!strcmp(tab, kHdrTab) && g_colorSpace != color_space::hdr10_pq &&
-        g_colorSpace != color_space::extended_srgb_linear)
-        ImGui::TextColored(kWarn, "The game isn't outputting HDR now: switch HDR on in its menu first.");
     const char* section = nullptr;
     for (Option& o : g_options) {
         if (strcmp(o.tab, tab)) continue;
@@ -1193,9 +1182,9 @@ void DrawOverlay(effect_runtime*) {
         ImGui::EndCombo();
     }
     ImGui::EndDisabled();
-    Help("Sets the Lighting, Shadows and Detail options together (Image and HDR stay as\n"
-         "they are). Measure preset costs checks them on your PC. Changing an option\n"
-         "afterwards shows Custom.");
+    Help("Sets the Lighting, Shadows and Detail options together (Image stays as it is).\n"
+         "Measure preset costs checks them on your PC. Changing an option afterwards\n"
+         "shows Custom.");
     ImGui::SameLine();
     float ms = Mean(g_frameMs);
     if (ms > 0) ImGui::TextDisabled("   %.1f ms (%.0f fps)", ms, 1000.0f / ms);

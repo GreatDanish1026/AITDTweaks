@@ -126,4 +126,5 @@ r.CapsuleShadows 1, fog depth slices 128.
 The game's HDR is Unreal's ACES output for a 1000-nit display in scRGB (OutputDevice 5, FP16
 swap chain, colour space scRGB). UE 4.27 has no peak-luminance cvar (only EnableHDROutput,
 OutputDevice, ColorGamut, UI.CompositeMode and UI.Level), so the highest built-in target is
-2000 nits (OutputDevice 6, the HDR tab's option).
+2000 nits (OutputDevice 6). 0.2.0 briefly offered that as an HDR tab; it was removed before
+release because HDR is left to RenoDX, which replaces the game's tone mapping and sets any peak.
