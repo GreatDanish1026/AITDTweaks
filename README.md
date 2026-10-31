@@ -12,7 +12,8 @@ in-game overlay.
   full-resolution character shadows.
 - **Detail**: texture memory beyond the game's 3 GB, textures kept fully loaded, further view
   distance, the most detailed models, plants and characters.
-- **Image**: DLAA, DLSS and tonemapper sharpening, film grain and vignette, lens flares, bloom.
+- **Image**: frame rate limit above the menu's 144 (240, 360 or unlimited), DLAA, DLSS and
+  tonemapper sharpening, film grain and vignette, lens flares, bloom.
 - **HDR**: not included: use RenoDX for HDR (it replaces the game's tone mapping and sets the peak).
 - **Quality presets**: *Ultra+* and *Cinematic* (not measured yet). **Measure preset costs** and
   **Measure each option** check them on your PC (uncap the frame rate first).

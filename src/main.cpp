@@ -274,6 +274,16 @@ std::vector<Option> g_options = {
      {{"Game", 0, {}}, {"Highest", 1, {{L"r.SkeletalMeshLODBias", L"-1"}}}}},
 
     // ------------------------------------------------ image (taste; in no preset)
+    {kImageTab, "Frame rate", "FrameLimit", "Frame rate limit",
+     "The game's menu stops at 144 fps (t.MaxFPS). This raises or removes that limit.\n"
+     "V-Sync still holds the frame rate to your display's refresh rate: switch it off in\n"
+     "the game's menu (or use G-Sync with the NVIDIA control panel's limit) to go higher.\n"
+     "Unlimited is also what Measure needs for true costs.",
+     L"t.MaxFPS",
+     {{"Game", 0, {}},
+      {"240 fps", 240, {{L"t.MaxFPS", L"240"}}},
+      {"360 fps", 360, {{L"t.MaxFPS", L"360"}}},
+      {"Unlimited", 1, {{L"t.MaxFPS", L"0"}}}}},
     {kImageTab, "DLSS", "Dlaa", "DLAA",
      "DLSS at full resolution: the sharpest, steadiest image, no upscaling. Overrides the\n"
      "game's DLSS mode; costs about as much as native 4K.",
@@ -884,8 +894,8 @@ bool AtFrameCap(float gameMs) {
 }
 
 constexpr const char* kCapNote =
-    " Game ran at the frame rate limit, so these costs are too low: switch off the limit and V-Sync in the "
-    "game's menu and measure again.";
+    " Game ran at the frame rate limit, so these costs are too low: set Image > Frame rate limit to "
+    "Unlimited, switch V-Sync off in the game's menu and measure again.";
 
 void SummarizeMeasure() {
     const std::vector<float>& r = g_measure.resultMs;
